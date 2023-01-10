@@ -2,14 +2,16 @@ use crate::unit::ConversionResponse;
 use crate::unit::Currency;
 
 pub(crate) async fn conversion(text: String) -> String {
-    println!("Converting!!");
     let converted = convert_currency(text.as_str()).await;
-    converted.unwrap()
+    match converted {
+        Ok(_) => converted.unwrap(),
+        Err(_) => converted.unwrap_err(),
+    }
 }
 
-async fn convert_currency(text: &str) -> Result<String, reqwest::Error> {
+async fn convert_currency(text: &str) -> Result<String, String> {
     println!("Parsing!");
-    let currency = parse_currency(text);
+    let currency = parse_currency(text)?;
     println!("Got the API key, sending req");
 
     let conversions = get_conversions(&currency).await?;
@@ -28,7 +30,7 @@ fn calc_conversions(currency: &Currency, conversions: ConversionResponse) -> Str
     )
 }
 
-async fn get_conversions(currency: &Currency) -> Result<ConversionResponse, reqwest::Error> {
+async fn get_conversions(currency: &Currency) -> Result<ConversionResponse, String> {
     println!("Using api key");
     let api_key = std::env::var("EXCHANGE_API_KEY").unwrap();
     println!("{}", api_key);
@@ -42,28 +44,32 @@ async fn get_conversions(currency: &Currency) -> Result<ConversionResponse, reqw
             ("base", &currency.base),
         ])
         .send()
-        .await?;
+        .await
+        .map_err(|e| format!("Couldn't send request properly {:?}", e))?;
 
-    if res.status().is_success() {
-        println!("success!");
-    } else if res.status().is_server_error() {
-        println!("server error!");
-    } else {
+
+        if !res.status().is_success() {
         println!("Something else happened. Status: {:?}", res.status());
+        return Err(format!(
+            "HTTP request failed with {:?}, couldn't get conversion",
+            res.status()
+        ));
     }
+
     println!("body = {:?}", res);
 
-    let conversion_response = res.json::<ConversionResponse>().await?;
-    println!("Read response {:?}", conversion_response);
+    let conversion_response = res
+        .json::<ConversionResponse>()
+        .await
+        .map_err(|e| format!("Couldn't read the JSON response properly {:?}", e))?;
     Ok(conversion_response)
 }
-fn parse_currency(text: &str) -> Currency {
+fn parse_currency(text: &str) -> Result<Currency, String> {
     println!("Parsing currency!");
     let mut value_chars: Vec<char> = Vec::new();
     let mut unit: Vec<char> = Vec::new();
 
     for ch in text.chars() {
-        println!("parsing {}", ch);
         if ch == ' ' {
             break;
         }
@@ -75,30 +81,32 @@ fn parse_currency(text: &str) -> Currency {
 
         unit.push(ch);
     }
-    println!("Done reading out units");
-    let value: f64 = value_chars.iter().collect::<String>().parse().unwrap();
-    let curr = match unit.iter().collect::<String>().as_str() {
-        "€" | "EUR" => Currency {
+    let value = value_chars
+        .iter()
+        .collect::<String>()
+        .parse::<f64>()
+        .map_err(|e| format!("Failed to parse the value of conversion {:?}", e))?;
+
+    match unit.iter().collect::<String>().as_str() {
+        "€" | "EUR" => Ok(Currency {
             base: "EUR".to_string(),
             value,
-        },
-        "$" | "USD" => Currency {
+        }),
+        "$" | "USD" => Ok(Currency {
             base: "USD".to_string(),
             value,
-        },
-        "PLN" => Currency {
+        }),
+        "PLN" => Ok(Currency {
             base: "PLN".to_string(),
             value,
-        },
-        "GBP" | "£" => Currency {
+        }),
+        "GBP" | "£" => Ok(Currency {
             base: "GBP".to_string(),
             value,
-        },
+        }),
 
-        _ => panic!("uhhh"),
-    };
-    println!("Value {}", value);
-    curr
+        _ => Err(format!("Not in the list of valid currencies")),
+    }
 }
 
 #[cfg(test)]

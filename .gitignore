@@ -1,1 +1,6 @@
 /target
+.env
+.idea/vcs.xml
+.gitignore
+.idea/modules.xml
+.gitignore
