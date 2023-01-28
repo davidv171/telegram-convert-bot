@@ -7,6 +7,7 @@ mod currency;
 mod temp;
 mod distance;
 mod weight;
+mod volume;
 
 #[tokio::main]
 async fn main() {

@@ -12,6 +12,7 @@ pub enum UnitType {
     Length,
     Temperature,
     Currency,
+    Volume,
 }
 
 
@@ -19,9 +20,10 @@ impl Unit {
     pub async fn convert(text: &str) -> Result<String, String> {
         let unit = Unit::parse(text)?;
         let unit_type = match unit.base.as_str() {
-            "kg" | "g" | "lb" | "oz" => UnitType::Weight,
+            "kg" | "g" | "lb" | "oz" | "st" => UnitType::Weight,
             "m" | "cm" | "in" | "ft" | "yd" | "mi" => UnitType::Length,
             "°C" | "°F" | "K" => UnitType::Temperature,
+            "L" | "l" | "gal" | "galUK" | "galUS" | "pt" => UnitType::Volume,
             _ => UnitType::Currency,
         };
         let conversion: String = match unit_type {
@@ -36,6 +38,9 @@ impl Unit {
             }
             UnitType::Temperature => {
                 crate::temp::convert(&unit)
+            }
+            UnitType::Volume => {
+                crate::volume::convert(&unit)
             }
         };
         return Ok(conversion);

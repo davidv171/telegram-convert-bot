@@ -5,8 +5,11 @@ pub async fn convert(unit: &Unit) -> Result<String, String> {
     println!("Got the API key, sending req");
 
     let accommodated_unit = accommodate_symbols(&unit);
+
     let conversions = get_currency_conversions(&accommodated_unit).await?;
+
     let calculated_conversions = calc_currency_conversions(&accommodated_unit, conversions);
+
     Ok(calculated_conversions)
 }
 
@@ -27,8 +30,10 @@ async fn get_currency_conversions(currency: &Unit) -> Result<ConversionResponse,
     let api_key = std::env::var("EXCHANGE_API_KEY").unwrap();
     println!("{}", api_key);
     let client = reqwest::Client::new();
+
     let supported_currencies = std::env::var("SUPPORTED_CURRENCIES").unwrap();
     let mut currencies: Vec<&str> = supported_currencies.split(",").collect();
+
     currencies.retain(|&x| x != currency.base);
     println!("currencies = {:?}", currencies);
 
