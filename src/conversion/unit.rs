@@ -14,11 +14,9 @@ pub enum UnitType {
     Currency,
     Volume,
 }
-
 impl Unit {
-    pub async fn convert(text: &str) -> Result<String, String> {
-        let unit = Unit::parse(text)?;
-        let unit_type = match unit.base.as_str() {
+    pub(super) async fn convert(&self) -> Result<String, String> {
+        let unit_type = match self.base.as_str() {
             "kg" | "g" | "lb" | "oz" | "st" => UnitType::Weight,
             "m" | "cm" | "in" | "ft" | "yd" | "mi" => UnitType::Length,
             "°C" | "°F" | "K" => UnitType::Temperature,
@@ -26,15 +24,15 @@ impl Unit {
             _ => UnitType::Currency,
         };
         let conversion: String = match unit_type {
-            UnitType::Currency => crate::currency::convert(&unit).await?,
-            UnitType::Weight => crate::weight::convert(&unit),
-            UnitType::Length => crate::distance::convert(&unit),
-            UnitType::Temperature => crate::temp::convert(&unit),
-            UnitType::Volume => crate::volume::convert(&unit),
+            UnitType::Currency => crate::conversion::currency::convert(self).await?,
+            UnitType::Weight => crate::conversion::weight::convert(self),
+            UnitType::Length => crate::conversion::distance::convert(self),
+            UnitType::Temperature => crate::conversion::temp::convert(self),
+            UnitType::Volume => crate::conversion::volume::convert(self),
         };
         return Ok(conversion);
     }
-    fn parse(text: &str) -> Result<Unit, String> {
+    pub(super) fn parse(text: &str) -> Result<Unit, String> {
         let mut value_chars = Vec::new();
         let mut unit = Vec::new();
 

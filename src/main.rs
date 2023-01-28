@@ -1,19 +1,13 @@
-use crate::command::answer;
+mod bot;
+mod conversion;
 use teloxide::prelude::*;
-mod command;
-mod currency;
-mod distance;
-mod temp;
-mod unit;
-mod volume;
-mod weight;
 
 #[tokio::main]
 async fn main() {
     pretty_env_logger::init();
-    log::info!("Starting command bot...");
+    log::info!("Starting bot bot...");
 
     let bot = Bot::from_env();
 
-    command::TCommand::repl(bot, answer).await;
+    bot::command::TCommand::repl(bot, bot::command::answer).await;
 }

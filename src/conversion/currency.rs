@@ -1,4 +1,4 @@
-use crate::unit::{ConversionResponse, Unit};
+use crate::conversion::unit::{ConversionResponse, Unit};
 
 pub async fn convert(unit: &Unit) -> Result<String, String> {
     println!("Parsing!");

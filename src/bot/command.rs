@@ -1,4 +1,4 @@
-use crate::unit::Unit;
+use crate::conversion::unit;
 use teloxide::utils::command::BotCommands;
 use teloxide::{
     payloads::SendMessageSetters,
@@ -35,7 +35,7 @@ pub async fn answer(bot: Bot, msg: Message, cmd: TCommand) -> ResponseResult<()>
 }
 
 async fn convert(text: String, bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError> {
-    let conversion = Unit::convert(text.as_str()).await;
+    let conversion = unit::Unit::convert(text.as_str()).await;
     let res = match conversion {
         Ok(_) => conversion.unwrap(),
         Err(_) => conversion.unwrap_err(),
