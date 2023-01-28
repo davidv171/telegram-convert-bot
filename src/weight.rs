@@ -1,10 +1,7 @@
 use crate::unit::Unit;
 
 pub(crate) fn convert(unit: &Unit) -> String {
-    let mut result = format!(
-        "{} {} is\n",
-        unit.value, unit.base
-    );
+    let mut result = format!("{} {} is\n", unit.value, unit.base);
     match unit.base.as_str() {
         "kg" => {
             result.push_str(&format!("{:.3} lb\n", unit.value * 2.20462));
@@ -27,7 +24,7 @@ pub(crate) fn convert(unit: &Unit) -> String {
             result.push_str(&format!("{:.3} g\n", unit.value * 28.3495));
             result.push_str(&format!("{:.3} lb\n", unit.value * 0.0625));
             result.push_str(&format!("{:.3} st\n", unit.value * 0.00446429));
-        },
+        }
         "st" => {
             result.push_str(&format!("{:.3} kg\n", unit.value * 6.35029));
             result.push_str(&format!("{:.3} g\n", unit.value * 6350.29));

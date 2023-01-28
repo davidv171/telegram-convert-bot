@@ -1,10 +1,7 @@
 use crate::unit::Unit;
 
 pub(crate) fn convert(unit: &Unit) -> String {
-    let mut result = format!(
-        "{} {} is\n",
-        unit.value, unit.base
-    );
+    let mut result = format!("{} {} is\n", unit.value, unit.base);
     match unit.base.as_str() {
         "m" => {
             result.push_str(&format!("{:.3} ft\n", unit.value * 3.28084));

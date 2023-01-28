@@ -8,4 +8,3 @@ pub(crate) async fn conversion(text: String) -> String {
         Err(_) => converted.unwrap_err(),
     }
 }
-

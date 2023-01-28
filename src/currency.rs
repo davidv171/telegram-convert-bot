@@ -14,10 +14,7 @@ pub async fn convert(unit: &Unit) -> Result<String, String> {
 }
 
 fn calc_currency_conversions(currency: &Unit, conversions: ConversionResponse) -> String {
-    let mut result = format!(
-        "{} {} is\n",
-        currency.value, currency.base
-    );
+    let mut result = format!("{} {} is\n", currency.value, currency.base);
     for (key, value) in conversions.rates {
         result.push_str(&format!("{:.3} {}\n", currency.value * value, key));
     }

@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use serde::Deserialize;
 use serde::Serialize;
+use std::collections::HashMap;
 
 pub struct Unit {
     pub base: String,
@@ -15,7 +15,6 @@ pub enum UnitType {
     Volume,
 }
 
-
 impl Unit {
     pub async fn convert(text: &str) -> Result<String, String> {
         let unit = Unit::parse(text)?;
@@ -27,21 +26,11 @@ impl Unit {
             _ => UnitType::Currency,
         };
         let conversion: String = match unit_type {
-            UnitType::Currency => {
-                crate::currency::convert(&unit).await?
-            }
-            UnitType::Weight => {
-                crate::weight::convert(&unit)
-            }
-            UnitType::Length => {
-                crate::distance::convert(&unit)
-            }
-            UnitType::Temperature => {
-                crate::temp::convert(&unit)
-            }
-            UnitType::Volume => {
-                crate::volume::convert(&unit)
-            }
+            UnitType::Currency => crate::currency::convert(&unit).await?,
+            UnitType::Weight => crate::weight::convert(&unit),
+            UnitType::Length => crate::distance::convert(&unit),
+            UnitType::Temperature => crate::temp::convert(&unit),
+            UnitType::Volume => crate::volume::convert(&unit),
         };
         return Ok(conversion);
     }
@@ -75,15 +64,11 @@ impl Unit {
         if base.trim().is_empty() {
             return Err("Missing unit, no letters?".to_string());
         }
-        let unit: Unit = Unit {
-            base,
-            value,
-        };
+        let unit: Unit = Unit { base, value };
         Ok(unit)
     }
     // Thank you github copilot
 }
-
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ConversionResponse {
