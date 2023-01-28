@@ -3,6 +3,10 @@ use teloxide::prelude::*;
 mod command;
 mod parse;
 mod unit;
+mod currency;
+mod temp;
+mod distance;
+mod weight;
 
 #[tokio::main]
 async fn main() {
