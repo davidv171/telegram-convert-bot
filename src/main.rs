@@ -3,7 +3,6 @@ use teloxide::prelude::*;
 mod command;
 mod currency;
 mod distance;
-mod parse;
 mod temp;
 mod unit;
 mod volume;

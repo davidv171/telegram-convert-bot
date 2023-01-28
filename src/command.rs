@@ -1,3 +1,4 @@
+use crate::unit::Unit;
 use teloxide::utils::command::BotCommands;
 use teloxide::{
     payloads::SendMessageSetters,
@@ -34,9 +35,14 @@ pub async fn answer(bot: Bot, msg: Message, cmd: TCommand) -> ResponseResult<()>
 }
 
 async fn convert(text: String, bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError> {
-    let res = crate::parse::conversion(text);
+    let conversion = Unit::convert(text.as_str()).await;
+    let res = match conversion {
+        Ok(_) => conversion.unwrap(),
+        Err(_) => conversion.unwrap_err(),
+    };
+
     Ok(bot
-        .send_message(msg.chat.id, res.await)
+        .send_message(msg.chat.id, res)
         .reply_to_message_id(msg.id)
         .await?)
 }

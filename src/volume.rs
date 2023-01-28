@@ -1,5 +1,4 @@
 use crate::unit::Unit;
-use log::max_level;
 
 pub(crate) fn convert(unit: &Unit) -> String {
     let mut result = format!("{} {} is\n", unit.value, unit.base);
