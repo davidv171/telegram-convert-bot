@@ -17,7 +17,7 @@ pub enum UnitType {
 impl Unit {
     pub(super) async fn convert(&self) -> Result<String, String> {
         let unit_type = match self.base.as_str() {
-            "kg" | "g" | "lb" | "oz" | "st" => UnitType::Weight,
+            "kg" | "g" | "lb" | "lbs" | "oz" | "st" => UnitType::Weight,
             "m" | "cm" | "in" | "ft" | "yd" | "mi" => UnitType::Length,
             "°C" | "°F" | "K" => UnitType::Temperature,
             "L" | "l" | "gal" | "galUK" | "galUS" | "pt" => UnitType::Volume,

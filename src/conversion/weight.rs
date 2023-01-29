@@ -13,7 +13,7 @@ pub(super) fn convert(unit: &Unit) -> String {
             result.push_str(&format!("{:.3} oz\n", unit.value * 0.035274));
             result.push_str(&format!("{:.3} st\n", unit.value * 0.000157473));
         }
-        "lb" => {
+        "lb" | "lbs" => {
             result.push_str(&format!("{:.3} kg\n", unit.value * 0.453592));
             result.push_str(&format!("{:.3} g\n", unit.value * 453.592));
             result.push_str(&format!("{:.3} oz\n", unit.value * 16.0));
