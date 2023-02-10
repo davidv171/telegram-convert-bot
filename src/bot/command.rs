@@ -30,17 +30,14 @@ pub async fn answer(bot: Bot, msg: Message, cmd: TCommand) -> ResponseResult<()>
         }
         TCommand::Convert(text) => convert(text, bot, msg).await?,
         TCommand::C(text) => convert(text, bot, msg).await?,
-        TCommand::Dice(_) => send_dice(bot,msg).await?,
+        TCommand::Dice(_) => send_dice(bot, msg).await?,
     };
 
     Ok(())
 }
 
-async fn send_dice(bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError>  {
-    Ok(bot
-        .send_dice(msg.chat.id)
-        .await?
-    )
+async fn send_dice(bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError> {
+    Ok(bot.send_dice(msg.chat.id).await?)
 }
 
 async fn convert(text: String, bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError> {
@@ -55,4 +52,3 @@ async fn convert(text: String, bot: Bot, msg: Message) -> Result<Message, teloxi
         .reply_to_message_id(msg.id)
         .await?)
 }
-
