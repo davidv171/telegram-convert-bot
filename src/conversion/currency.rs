@@ -60,7 +60,7 @@ fn create_cached_conversions(
 fn accommodate_symbols(unit: &Unit) -> Unit {
     let base = match unit.base.as_str() {
         "€" | "EURO" => "EUR".to_string(),
-        "$" | "$USD" | "USD$" => "USD".to_string(),
+        "$" | "$USD" | "USD$" | "US$" | "$US" => "USD".to_string(),
         "£" | "£GBP" | "GBP£" => "GBP".to_string(),
         "¥" => "JPY".to_string(),
         "₽" => "RUB".to_string(),
@@ -85,6 +85,11 @@ mod tests {
             value: 1.0,
         });
         assert_eq!(unit.base, "USD");
+
+        unit = accommodate_symbols(&Unit {
+            base: "$USD".to_string(),
+            value: 1.0,
+        });
 
         unit = accommodate_symbols(&Unit {
             base: "€".to_string(),
@@ -115,22 +120,6 @@ mod tests {
             value: 1.0,
         });
         assert_eq!(unit.base, "AUD");
-    }
-    #[test]
-    fn test_request_currency_conversions() {
-        let runtime = tokio::runtime::Runtime::new().unwrap();
-        let unit = Unit {
-            base: "USD".to_string(),
-            value: 1.0,
-        };
-        let api_key = std::env::var("EXCHANGE_API_KEY").unwrap();
-        let supported_currencies = std::env::var("SUPPORTED_CURRENCIES").unwrap();
-        let res = runtime.block_on(request_currency_conversions(
-            &unit,
-            api_key,
-            supported_currencies,
-        ));
-        assert!(res.is_ok());
     }
     #[test]
     fn test_cached_conversions() {

@@ -14,7 +14,7 @@ async fn main() {
     let bot = Bot::from_env();
 
     let forever = task::spawn(async {
-        let mut interval = time::interval(Duration::from_secs(3600 * 6));
+        let mut interval = time::interval(Duration::from_secs(3600 * 12));
         loop {
             println!("Scheduled cache update time");
             interval.tick().await;
