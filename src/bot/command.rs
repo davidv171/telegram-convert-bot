@@ -1,3 +1,4 @@
+use crate::conversion::conversion_cache::ALL_CURRENCIES;
 use teloxide::utils::command::BotCommands;
 use teloxide::{
     payloads::SendMessageSetters,
@@ -18,6 +19,10 @@ pub enum TCommand {
     Convert(String),
     #[command(description = "Convert short hand")]
     C(String),
+    #[command(description = "Dice")]
+    Dice(String),
+    #[command(description = "List all available currencies codes")]
+    ListCurrencies(String),
 }
 
 pub async fn answer(bot: Bot, msg: Message, cmd: TCommand) -> ResponseResult<()> {
@@ -28,9 +33,19 @@ pub async fn answer(bot: Bot, msg: Message, cmd: TCommand) -> ResponseResult<()>
         }
         TCommand::Convert(text) => convert(text, bot, msg).await?,
         TCommand::C(text) => convert(text, bot, msg).await?,
+        TCommand::Dice(_) => send_dice(bot, msg).await?,
+        TCommand::ListCurrencies(_) => list_currencies(bot, msg).await?,
     };
 
     Ok(())
+}
+
+async fn list_currencies(bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError> {
+    Ok(bot.send_message(msg.chat.id, ALL_CURRENCIES).await?)
+}
+
+async fn send_dice(bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError> {
+    Ok(bot.send_dice(msg.chat.id).await?)
 }
 
 async fn convert(text: String, bot: Bot, msg: Message) -> Result<Message, teloxide::RequestError> {
