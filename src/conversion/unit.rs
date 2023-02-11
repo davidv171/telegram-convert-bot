@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde::Deserialize;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -42,8 +43,16 @@ impl Unit {
         let mut value_chars = Vec::new();
         let mut unit = Vec::new();
 
+        // Check if format is: decimal number + optional space + unit
+        if !Regex::new(r"^(\d+(,\d{3})*(\.\d+)?)\s*\w+")
+            .unwrap()
+            .is_match(text)
+        {
+            return Err("Invalid format, should be: decimal number + space + unit".to_string());
+        }
+        // check if number then text
         for ch in text.chars() {
-            if ch == ' ' {
+            if ch.is_whitespace() {
                 continue;
             }
 
@@ -58,6 +67,7 @@ impl Unit {
 
             unit.push(ch);
         }
+
         let value = value_chars
             .iter()
             .collect::<String>()
@@ -98,13 +108,19 @@ mod tests {
     }
     #[test]
     fn test_parse_with_commas() {
-        let unit = Unit::parse("1,000 kg").unwrap();
+        let unit = Unit::parse("1,000 kg ").unwrap();
         assert_eq!(unit.base, "kg");
         assert_eq!(unit.value, 1000.0);
     }
     #[test]
     fn test_parse_with_multiple_spaces() {
         let unit = Unit::parse("1  kg").unwrap();
+        assert_eq!(unit.base, "kg");
+        assert_eq!(unit.value, 1.0);
+    }
+    #[test]
+    fn test_parse_with_multiple_spaces_and_at_the_end() {
+        let unit = Unit::parse("1  kg            ").unwrap();
         assert_eq!(unit.base, "kg");
         assert_eq!(unit.value, 1.0);
     }
@@ -157,55 +173,47 @@ mod tests {
 
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit() {
-        let unit = Unit::parse(" , , , 1 kg").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg");
+        assert!(unit.is_err());
     }
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit_and_spaces() {
-        let unit = Unit::parse(" , , , 1 kg ").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg ");
+        assert!(unit.is_err());
     }
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit_and_spaces_and_commas() {
-        let unit = Unit::parse(" , , , 1 kg ,").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg ,");
+        assert!(unit.is_err());
     }
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit_and_spaces_and_commas_and_more_spaces(
     ) {
-        let unit = Unit::parse(" , , , 1 kg ,  ").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg ,  ");
+        assert!(unit.is_err());
     }
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit_and_spaces_and_commas_and_more_spaces_and_more_commas(
     ) {
-        let unit = Unit::parse(" , , , 1 kg ,  ,  ").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg ,  ,  ");
+        assert!(unit.is_err());
     }
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit_and_spaces_and_commas_and_more_spaces_and_more_commas_and_value(
     ) {
-        let unit = Unit::parse(" , , , 1 kg ,  ,  , 1").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg ,  ,  , 1");
+        assert!(unit.is_err());
     }
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit_and_spaces_and_commas_and_more_spaces_and_more_commas_and_value_and_unit(
     ) {
-        let unit = Unit::parse(" , , , 1 kg ,  ,  , 1 kg").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg ,  ,  , 1 kg");
+        assert!(unit.is_err());
     }
     #[test]
     fn test_parse_with_nothing_but_spaces_and_commas_and_value_and_unit_and_spaces_and_commas_and_more_spaces_and_more_commas_and_value_and_unit_and_spaces(
     ) {
-        let unit = Unit::parse(" , , , 1 kg ,  ,  , 1 kg ").unwrap();
-        assert_eq!(unit.base, "kg");
-        assert_eq!(unit.value, 1.0);
+        let unit = Unit::parse(" , , , 1 kg ,  ,  , 1 kg ");
+        assert!(unit.is_err());
     }
 }

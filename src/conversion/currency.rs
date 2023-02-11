@@ -1,6 +1,5 @@
 use crate::conversion::conversion_cache::CONVERSION_CACHE;
-use crate::conversion::unit::{ConversionResponse, Unit};
-use reqwest::blocking::Client;
+use crate::conversion::unit::Unit;
 use std::collections::HashMap;
 use std::time::Instant;
 
@@ -90,6 +89,7 @@ mod tests {
             base: "$USD".to_string(),
             value: 1.0,
         });
+        assert_eq!(unit.base, "USD");
 
         unit = accommodate_symbols(&Unit {
             base: "€".to_string(),

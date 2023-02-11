@@ -1012,6 +1012,7 @@ dependencies = [
  "lazy_static",
  "log",
  "pretty_env_logger",
+ "regex",
  "reqwest",
  "serde",
  "teloxide",
